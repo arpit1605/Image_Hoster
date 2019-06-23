@@ -1,8 +1,10 @@
 package ImageHoster.controller;
 
+import ImageHoster.model.Comment;
 import ImageHoster.model.Image;
 import ImageHoster.model.Tag;
 import ImageHoster.model.User;
+import ImageHoster.service.CommentService;
 import ImageHoster.service.ImageService;
 import ImageHoster.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class ImageController {
     @Autowired
     private TagService tagService;
 
+    @Autowired
+    private CommentService commentService;
+
     //This method displays all the images in the user home page after successful login
     @RequestMapping("images")
     public String getUserImages(Model model) {
@@ -46,10 +51,12 @@ public class ImageController {
     //Here a list of tags is added in the Model type object
     //this list is then sent to 'images/image.html' file and the tags are displayed
     @RequestMapping("/images/{id}/{title}")
-    public String showImage(@PathVariable("id") Integer id, Model model) {
+    public String showImage(@PathVariable("id") Integer id, Model model, HttpSession session) {
         Image image = imageService.getImageById(id);
+        User user = (User) session.getAttribute("loggeduser");
         model.addAttribute("image", image);
         model.addAttribute("tags", image.getTags());
+        //model.addAttribute("comments", user.getComment());
         return "images/image";
     }
 
@@ -108,6 +115,7 @@ public class ImageController {
             model.addAttribute("image", image);
             model.addAttribute("tags", tags);
             model.addAttribute("editError", error);
+            //model.addAttribute("comments", user.getComment());
             return "images/image";
         }
     }
@@ -163,11 +171,22 @@ public class ImageController {
             String error = "Only the owner of the image can delete the image";
             model.addAttribute("image", image);
             model.addAttribute("tags", tags);
+            //model.addAttribute("comments", user.getComment());
             model.addAttribute("deleteError", error);
             return "images/image";
         }
     }
 
+    //This controller method is called when the request pattern is of type '/image/{imageId}/{imageTitle}/comments' and also the incoming request is of POST type
+    //The method calls the createComment() method in the business logic passing the id of the image to be deleted
+    //Looks for a controller method with request mapping of type '/images'
+    @RequestMapping(value = "/image/{imageId}/{imageTitle}/comments", method = RequestMethod.POST)
+    public String commentImageSubmit(@RequestParam(name = "imageId") Integer imageId, Model model, HttpSession session) {
+        Image image = imageService.getImage(imageId);
+        //Comment comment = commentService.getComment(id);
+        //commentService.createComment(imageId);
+        return "redirect:/images";
+    }
 
     //This method converts the image to Base64 format
     private String convertUploadedFileToBase64(MultipartFile file) throws IOException {

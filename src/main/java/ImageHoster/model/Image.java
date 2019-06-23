@@ -50,6 +50,15 @@ public class Image {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Tag> tags = new ArrayList<>();
 
+    /*
+    //The 'images' table is referenced by the 'comment' table
+    //The table (primary key is referenced by the 'image' field in the 'comment' table
+    //cascade = CascadeType.REMOVE specifies that if a record in 'images' table is deleted, then all the records in 'comment' table associted will also be deleted
+    //FetchType is EAGER
+    @OneToMany(mappedBy = "image", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    private List<Image> images = new ArrayList<>();
+    */
+
     public Image() {
     }
 
@@ -123,4 +132,14 @@ public class Image {
     public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
+
+    /*
+    public List<Image> getImages() {
+        return images;
+    }
+
+    public void setImages(List<Image> images) {
+        this.images = images;
+    }
+    */
 }
